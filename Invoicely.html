@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Invoicely</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Fraunces:ital,wght@0,400;0,600;1,400&family=Mrs+Saint+Delafield&family=Space+Mono:wght@400;700&family=Vazirmatn:wght@300;400;600;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #eeece6;
+      --card: #fff;
+      --ink: #16150f;
+      --mut: #82806f;
+      --hl: #e4e1d6;
+      --fld: #f4f2ec;
+      --btn: #16150f;
+      --btt: #fff;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0d0d0b;
+        --card: #1a1916;
+        --ink: #f2f0e9;
+        --mut: #97958a;
+        --hl: #2d2b26;
+        --fld: #24231f;
+        --btn: #f2f0e9;
+        --btt: #16150f
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0d0d0b;
+      --card: #1a1916;
+      --ink: #f2f0e9;
+      --mut: #97958a;
+      --hl: #2d2b26;
+      --fld: #24231f;
+      --btn: #f2f0e9;
+      --btt: #16150f
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 400 14px/1.5 "Vazirmatn", "Bricolage Grotesque", system-ui, sans-serif
+    }
+
+    html[lang=en] body {
+      font-family: "Bricolage Grotesque", "Vazirmatn", system-ui, sans-serif
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px
+    }
+
+    .brand {
+      font: 800 21px "Bricolage Grotesque", sans-serif;
+      letter-spacing: -.04em;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-inline-end: auto
+    }
+
+    .brand i {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      background: var(--ink);
+      position: relative
+    }
+
+    .brand i::after {
+      content: "";
+      position: absolute;
+      inset: 6px 6px 6px 6px;
+      border-radius: 50%;
+      background: #ff5a36
+    }
+
+    .seg {
+      display: inline-flex;
+      background: var(--fld);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px
+    }
+
+    .seg button {
+      border: 0;
+      background: none;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--mut)
+    }
+
+    .seg button.on {
+      background: var(--card);
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .12)
+    }
+
+    .exp {
+      position: relative
+    }
+
+    .pri {
+      border: 0;
+      background: var(--btn);
+      color: var(--btt);
+      border-radius: 11px;
+      padding: 9px 18px;
+      font-weight: 700
+    }
+
+    .menu {
+      display: none;
+      position: absolute;
+      inset-inline-end: 0;
+      top: 46px;
+      background: var(--card);
+      border: 1px solid var(--hl);
+      border-radius: 14px;
+      padding: 6px;
+      min-width: 230px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+      z-index: 30
+    }
+
+    .menu.o {
+      display: block
+    }
+
+    .menu button {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+      border: 0;
+      background: none;
+      padding: 10px 12px;
+      border-radius: 9px;
+      text-align: start;
+      font-weight: 600
+    }
+
+    .menu button:hover {
+      background: var(--fld)
+    }
+
+    .menu small {
+      color: var(--mut);
+      font-weight: 400
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 292px 1fr;
+      gap: 24px;
+      padding: 6px 24px 60px;
+      align-items: start
+    }
+
+    @media(max-width:920px) {
+      .main {
+        grid-template-columns: 1fr;
+        padding: 4px 12px 50px
+      }
+
+      .stagewrap {
+        order: -1
+      }
+    }
+
+    .rail {
+      background: var(--card);
+      border: 1px solid var(--hl);
+      border-radius: 20px;
+      padding: 6px 18px 18px;
+      position: sticky;
+      top: 10px
+    }
+
+    @media(max-width:920px) {
+      .rail {
+        position: static
+      }
+    }
+
+    .rs {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--hl)
+    }
+
+    .rs:last-child {
+      border: 0
+    }
+
+    .rs h4 {
+      margin: 0 0 10px;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--mut);
+      font-weight: 700
+    }
+
+    html[lang=fa] .rs h4 {
+      letter-spacing: 0;
+      font-size: 12px
+    }
+
+    .tg {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px
+    }
+
+    .tb {
+      border: 0;
+      background: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: var(--mut);
+      font-weight: 600;
+      padding: 0
+    }
+
+    .tb svg {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 6px;
+      box-shadow: 0 0 0 1px var(--hl);
+      transition: .2s
+    }
+
+    .tb.on {
+      color: var(--ink)
+    }
+
+    .tb.on svg {
+      box-shadow: 0 0 0 2px var(--ink);
+      transform: translateY(-2px)
+    }
+
+    .sw {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .sw button {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 0;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15)
+    }
+
+    .sw button.on {
+      box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--ink)
+    }
+
+    .sw input {
+      width: 30px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: none
+    }
+
+    .rs input[type=text],
+    .rs select {
+      width: 100%;
+      font: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--fld);
+      border: 1.5px solid transparent;
+      border-radius: 10px;
+      padding: 9px 11px
+    }
+
+    .rs input:focus,
+    .rs select:focus {
+      outline: 0;
+      border-color: var(--ink)
+    }
+
+    .r2 {
+      display: grid;
+      grid-template-columns: 1fr 84px;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    .chk {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 13px;
+      cursor: pointer
+    }
+
+    .hint {
+      color: var(--mut);
+      font-size: 12px;
+      margin-top: 6px
+    }
+
+    .sp {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .tgl {
+      width: 40px;
+      height: 23px;
+      border-radius: 99px;
+      border: 0;
+      background: var(--hl);
+      position: relative;
+      transition: .2s
+    }
+
+    .tgl::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      inset-inline-start: 3px;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #fff;
+      transition: .2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .3)
+    }
+
+    .tgl.on {
+      background: #18b26b
+    }
+
+    .tgl.on::after {
+      inset-inline-start: 20px
+    }
+
+    .stagewrap {
+      display: flex;
+      justify-content: center
+    }
+
+    .stage {
+      width: 100%;
+      max-width: 794px
+    }
+
+    .pw {
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .4);
+      border-radius: 3px
+    }
+
+    .toast {
+      position: fixed;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--btn);
+      color: var(--btt);
+      padding: 9px 18px;
+      border-radius: 99px;
+      font-weight: 600;
+      font-size: 13px;
+      opacity: 0;
+      transition: .3s;
+      pointer-events: none;
+      z-index: 40
+    }
+
+    .toast.s {
+      opacity: 1
+    }
+
+    /* ===== paper ===== */
+    .paper {
+      --pb: #fff;
+      --px: #16150f;
+      --mu: #8a8776;
+      --ln: #e2dfd2;
+      width: 794px;
+      min-height: 1123px;
+      padding: 56px;
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 32px;
+      row-gap: 26px;
+      align-content: start;
+      background: var(--pb);
+      color: var(--px);
+      font: 400 13.5px/1.55 "Vazirmatn", "Bricolage Grotesque", sans-serif;
+      transform-origin: top left
+    }
+
+    html[lang=en] .paper {
+      font-family: "Bricolage Grotesque", "Vazirmatn", sans-serif
+    }
+
+    html[lang=fa] .paper * {
+      letter-spacing: 0 !important
+    }
+
+    .paper input,
+    .paper textarea {
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      padding: 2px 4px;
+      margin: 0 -4px;
+      width: calc(100% + 8px);
+      resize: none;
+      text-align: inherit;
+      border-radius: 5px;
+      display: block;
+      overflow: hidden;
+      transition: background .15s
+    }
+
+    .paper input:hover,
+    .paper textarea:hover {
+      background: rgba(128, 128, 128, .1)
+    }
+
+    .paper input:focus,
+    .paper textarea:focus {
+      background: rgba(128, 128, 128, .14);
+      box-shadow: 0 0 0 2px var(--acc)
+    }
+
+    .paper ::placeholder {
+      color: currentColor;
+      opacity: .32
+    }
+
+    .paper .lb {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--mu);
+      margin-bottom: 5px
+    }
+
+    .a-brand {
+      grid-area: brand
+    }
+
+    .a-title {
+      grid-area: title
+    }
+
+    .a-hero {
+      grid-area: hero
+    }
+
+    .a-meta {
+      grid-area: meta
+    }
+
+    .a-to {
+      grid-area: to
+    }
+
+    .a-from {
+      grid-area: from
+    }
+
+    .a-items {
+      grid-area: items
+    }
+
+    .a-pay {
+      grid-area: pay
+    }
+
+    .a-tot {
+      grid-area: tot
+    }
+
+    .a-sig {
+      grid-area: sig;
+      align-self: end
+    }
+
+    .lgz {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border: 1.5px dashed var(--ln);
+      border-radius: 14px;
+      color: var(--mu);
+      font-size: 11px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      overflow: hidden;
+      text-align: center
+    }
+
+    .lgz.has {
+      border: 0;
+      width: auto;
+      max-width: 150px;
+      height: auto;
+      justify-content: flex-start
+    }
+
+    .lgz img {
+      max-height: 60px;
+      max-width: 150px;
+      object-fit: contain
+    }
+
+    .lgz input {
+      display: none
+    }
+
+    .bn {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.2
+    }
+
+    .ttl {
+      font-weight: 800;
+      font-size: 38px;
+      letter-spacing: -.04em;
+      line-height: 1.1
+    }
+
+    .a-title {
+      text-align: end
+    }
+
+    .a-title .no {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      color: var(--mu)
+    }
+
+    .a-title .no input {
+      width: 90px;
+      text-align: end
+    }
+
+    .a-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px
+    }
+
+    .dt {
+      position: relative;
+      font-weight: 600;
+      cursor: pointer
+    }
+
+    .dt input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      margin: 0
+    }
+
+    .a-hero .big {
+      font-size: 84px;
+      font-weight: 800;
+      letter-spacing: -.05em;
+      line-height: 1;
+      color: var(--acc);
+      white-space: nowrap
+    }
+
+    .a-hero {
+      align-self: center
+    }
+
+    .paper table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .paper th {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--mu);
+      text-align: start;
+      padding: 0 8px 10px
+    }
+
+    .paper td {
+      padding: 11px 8px;
+      vertical-align: top;
+      position: relative
+    }
+
+    .paper .n {
+      text-align: end;
+      white-space: nowrap
+    }
+
+    .paper .q {
+      text-align: center;
+      width: 64px
+    }
+
+    .paper .q input {
+      text-align: center
+    }
+
+    .paper .n input {
+      text-align: end
+    }
+
+    .paper td.n {
+      width: 118px
+    }
+
+    .paper td:first-child,
+    .paper th:first-child {
+      padding-inline-start: 0
+    }
+
+    .paper td:last-child,
+    .paper th:last-child {
+      padding-inline-end: 0
+    }
+
+    .ui.x {
+      position: absolute;
+      inset-inline-end: -30px;
+      top: 11px;
+      border: 0;
+      background: rgba(128, 128, 128, .15);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 13px;
+      line-height: 1;
+      opacity: 0;
+      color: var(--px)
+    }
+
+    tr:hover .ui.x {
+      opacity: 1
+    }
+
+    .ui.add {
+      margin-top: 8px;
+      border: 1.5px dashed var(--ln);
+      background: none;
+      color: var(--mu);
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .tot {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-inline-start: auto;
+      width: 100%
+    }
+
+    .tot>div {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px
+    }
+
+    .tot .mu {
+      color: var(--mu)
+    }
+
+    .tot .gt {
+      font-weight: 800;
+      font-size: 20px;
+      padding-top: 10px;
+      margin-top: 4px;
+      border-top: 2px solid var(--px)
+    }
+
+    .tot .bd {
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--acc)
+    }
+
+    .sgi {
+      font: 400 54px/1 "Mrs Saint Delafield", cursive !important;
+      text-align: end
+    }
+
+    .a-sig .lb {
+      text-align: end;
+      margin-top: 4px;
+      border-top: 1px solid var(--ln);
+      padding-top: 6px;
+      width: 200px;
+      margin-inline-start: auto
+    }
+
+    .stamp {
+      position: absolute;
+      inset-inline-end: 60px;
+      top: 560px;
+      transform: rotate(-12deg);
+      border: 5px solid #18b26b;
+      color: #18b26b;
+      font-weight: 800;
+      font-size: 40px;
+      padding: 2px 18px;
+      border-radius: 10px;
+      letter-spacing: .1em;
+      opacity: .85;
+      pointer-events: none
+    }
+
+    /* folio + bloom */
+    [data-t=folio],
+    [data-t=bloom] {
+      grid-template-areas: "brand title" "hero hero" "to from" "meta meta" "items items" "pay tot" "sig sig";
+      grid-template-rows: repeat(6, auto) 1fr
+    }
+
+    [data-t=folio] {
+      --pb: #fbfaf5
+    }
+
+    [data-t=folio] .ttl {
+      font-size: 13px;
+      letter-spacing: .24em;
+      text-transform: uppercase
+    }
+
+    [data-t=folio] .a-hero {
+      border-block: 1.5px solid var(--px);
+      padding: 26px 0
+    }
+
+    [data-t=folio] .a-hero .lb {
+      margin-bottom: 10px
+    }
+
+    [data-t=folio] .a-meta {
+      border-bottom: 1px solid var(--ln);
+      padding-bottom: 20px
+    }
+
+    [data-t=folio] td {
+      border-bottom: 1px solid var(--ln)
+    }
+
+    [data-t=bloom] {
+      --pb: #fff;
+      padding-top: 64px
+    }
+
+    [data-t=bloom]::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 420px;
+      background: linear-gradient(170deg, var(--t2), var(--t1) 60%, #fff);
+      z-index: 0
+    }
+
+    [data-t=bloom]>* {
+      position: relative;
+      z-index: 1
+    }
+
+    [data-t=bloom] .ttl {
+      font: italic 400 44px/1 Fraunces, Vazirmatn, serif
+    }
+
+    [data-t=bloom] .big {
+      font: 600 80px/1 Fraunces, Vazirmatn, serif !important;
+      letter-spacing: -.03em;
+      color: var(--dk) !important
+    }
+
+    [data-t=bloom] .a-hero {
+      grid-column: 1/-1
+    }
+
+    [data-t=bloom] .a-to,
+    [data-t=bloom] .a-from {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px 22px;
+      box-shadow: 0 6px 24px -8px rgba(0, 0, 0, .12)
+    }
+
+    [data-t=bloom] .a-items {
+      border: 1.5px solid var(--t2);
+      border-radius: 22px;
+      padding: 22px 26px;
+      background: #fff
+    }
+
+    [data-t=bloom] .ui.x {
+      inset-inline-end: -46px
+    }
+
+    [data-t=bloom] td {
+      border-bottom: 1px dashed var(--t2)
+    }
+
+    [data-t=bloom] tr:last-child td {
+      border: 0
+    }
+
+    [data-t=bloom] .tot .gt {
+      border-top: 0;
+      background: var(--acc);
+      color: var(--on);
+      padding: 14px 18px;
+      border-radius: 14px
+    }
+
+    /* slab */
+    [data-t=slab] {
+      padding-inline: 0 52px;
+      grid-template-columns: 250px 1fr;
+      column-gap: 0;
+      grid-template-areas: "brand title" "meta items" "to items" "from items" "pay tot" "pay sig";
+      grid-template-rows: repeat(5, auto) 1fr
+    }
+
+    [data-t=slab]::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      width: 250px;
+      background: var(--acc)
+    }
+
+    [data-t=slab]>* {
+      position: relative
+    }
+
+    [data-t=slab] .a-hero {
+      display: none
+    }
+
+    [data-t=slab] .a-brand,
+    [data-t=slab] .a-meta,
+    [data-t=slab] .a-to,
+    [data-t=slab] .a-from,
+    [data-t=slab] .a-pay {
+      color: var(--on);
+      padding-inline: 34px 24px
+    }
+
+    [data-t=slab] .a-brand .lgz,
+    [data-t=slab] .a-brand .lgz.has {
+      border-color: var(--on);
+      color: var(--on)
+    }
+
+    [data-t=slab] .lb {
+      color: var(--on);
+      opacity: .65
+    }
+
+    [data-t=slab] .a-meta {
+      grid-template-columns: 1fr;
+      gap: 14px
+    }
+
+    [data-t=slab] .a-items,
+    [data-t=slab] .a-tot,
+    [data-t=slab] .a-sig,
+    [data-t=slab] .a-title {
+      padding-inline-start: 36px
+    }
+
+    [data-t=slab] .ttl {
+      font-size: 62px;
+      letter-spacing: -.05em;
+      text-transform: uppercase
+    }
+
+    [data-t=slab] th {
+      color: var(--px);
+      border-bottom: 2px solid var(--px)
+    }
+
+    [data-t=slab] td {
+      border-bottom: 1px solid var(--ln)
+    }
+
+    [data-t=slab] .ui.x {
+      inset-inline-end: -30px
+    }
+
+    [data-t=slab] .tot .gt {
+      border: 0;
+      background: var(--t1);
+      padding: 14px 16px;
+      border-radius: 0
+    }
+
+    /* grid */
+    [data-t=grid] {
+      --pb: #fff;
+      --ln: #16150f;
+      padding: 44px;
+      gap: 0;
+      grid-template-areas: "brand title" "meta hero" "to from" "items items" "pay tot" "sig sig";
+      grid-template-rows: repeat(5, auto) 1fr;
+      font-family: "Space Mono", "Vazirmatn", monospace
+    }
+
+    html[lang=en] [data-t=grid] {
+      font-family: "Space Mono", monospace
+    }
+
+    [data-t=grid]>div {
+      border: 1.5px solid var(--px);
+      margin: -.75px;
+      padding: 20px 22px
+    }
+
+    [data-t=grid] .lb {
+      font-family: inherit;
+      color: var(--px)
+    }
+
+    [data-t=grid] .bn,
+    [data-t=grid] .ttl {
+      font-family: "Bricolage Grotesque", "Vazirmatn", sans-serif
+    }
+
+    [data-t=grid] .ttl {
+      font-size: 46px;
+      text-transform: uppercase
+    }
+
+    [data-t=grid] .a-hero {
+      background: var(--acc);
+      color: var(--on)
+    }
+
+    [data-t=grid] .a-hero .big {
+      color: var(--on);
+      font-size: 46px;
+      font-family: "Bricolage Grotesque", "Vazirmatn"
+    }
+
+    [data-t=grid] .a-hero .lb {
+      color: var(--on)
+    }
+
+    [data-t=grid] .a-meta {
+      grid-template-columns: 1fr;
+      gap: 6px
+    }
+
+    [data-t=grid] .a-items {
+      padding: 0
+    }
+
+    [data-t=grid] th {
+      padding: 12px 14px;
+      border-bottom: 1.5px solid var(--px);
+      color: var(--px)
+    }
+
+    [data-t=grid] td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--ln)
+    }
+
+    [data-t=grid] .ui.x {
+      inset-inline-end: -44px
+    }
+
+    [data-t=grid] .ui.add {
+      margin: 10px
+    }
+
+    [data-t=grid] .tot .gt {
+      border-top: 1.5px solid var(--px)
+    }
+
+    [data-t=grid] .a-sig {
+      border: 0
+    }
+
+    /* dusk */
+    [data-t=dusk] {
+      --pb: #0d0f14;
+      --px: #eceae3;
+      --mu: #8b8f9c;
+      --ln: rgba(255, 255, 255, .1);
+      grid-template-areas: "brand title" "hero hero" "to from" "meta meta" "items items" "pay tot" "sig sig";
+      grid-template-rows: repeat(6, auto) 1fr;
+      background-image: radial-gradient(circle at 88% 4%, var(--gl), transparent 46%)
+    }
+
+    [data-t=dusk] .a-hero .big {
+      color: var(--lt);
+      font-size: 92px
+    }
+
+    [data-t=dusk] .a-to,
+    [data-t=dusk] .a-from,
+    [data-t=dusk] .a-items,
+    [data-t=dusk] .a-tot {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--ln);
+      border-radius: 20px;
+      padding: 22px 24px
+    }
+
+    [data-t=dusk] .ui.x {
+      inset-inline-end: -46px
+    }
+
+    [data-t=dusk] td {
+      border-bottom: 1px solid var(--ln)
+    }
+
+    [data-t=dusk] tr:last-child td {
+      border: 0
+    }
+
+    [data-t=dusk] .tot .gt {
+      border-color: var(--lt)
+    }
+
+    [data-t=dusk] .tot .bd {
+      color: var(--lt)
+    }
+
+    [data-t=dusk] .ui.add {
+      border-color: var(--ln)
+    }
+
+    [data-t=dusk] .ttl {
+      font-size: 30px;
+      font-weight: 600
+    }
+
+    [data-t=dusk] .stamp {
+      border-color: #3dd68c;
+      color: #3dd68c
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top">
+    <div class="brand"><i></i>Invoicely</div>
+    <div class="seg" id="lang"><button data-lang="fa">فا</button><button data-lang="en">EN</button></div>
+    <div class="exp"><button class="pri" id="expb"></button>
+      <div class="menu" id="menu"><button data-x="pdf">PDF <small>A4</small></button><button data-x="png">PNG <small
+            id="m1"></small></button><button data-x="ig">Instagram <small>1080×1350</small></button><button
+          data-x="li">LinkedIn <small>1200×627</small></button></div>
+    </div>
+  </div>
+  <div class="main">
+    <aside class="rail" id="rail"></aside>
+    <section class="stagewrap">
+      <div class="stage">
+        <div class="pw" id="pw">
+          <div class="paper" id="paper"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const T = {
+      fa: {
+        inv: "فاکتور", to: "صورت‌حساب برای", from: "صادرکننده", no: "شماره", date: "تاریخ", due: "سررسید", desc: "شرح", qty: "تعداد", rate: "قیمت", amt: "مبلغ", sub: "جمع جزء", disc: "تخفیف", tax: "مالیات", total: "جمع کل", paid: "پرداخت‌شده", bal: "مانده", dueamt: "مبلغ قابل پرداخت", pay: "اطلاعات پرداخت", notes: "توضیحات", sig: "امضا", add: "+ افزودن ردیف", stamp: "پرداخت شد",
+        ph: { co: "نام شرکت", tg: "زیرعنوان", em: "ایمیل", tel: "تلفن", ad: "آدرس", cl: "نام مشتری", item: "شرح کالا یا خدمت", pay: "بانک، شماره حساب، شبا…", nt: "شرایط پرداخت، تشکر…", sg: "امضا", tx: "مالیات", no: "001" },
+        r: { tpl: "قالب", acc: "رنگ برند", cur: "واحد پول", tax: "مالیات", disc: "تخفیف", dep: "پیش‌پرداخت", paid: "علامت پرداخت‌شده", incl: "قیمت‌ها شامل مالیات است", pct: "درصد", fix: "مبلغ ثابت", expo: "خروجی", lg: "افزودن لوگو" },
+        t: { folio: "ورق", slab: "ستون", grid: "شبکه", dusk: "شامگاه", bloom: "شکوفه" }, saved: "ذخیره شد", busy: "در حال ساخت…", fail: "خطا در ساخت فایل", m1: "تصویر"
+      },
+      en: {
+        inv: "Invoice", to: "Billed to", from: "From", no: "No.", date: "Date", due: "Due", desc: "Description", qty: "Qty", rate: "Rate", amt: "Amount", sub: "Subtotal", disc: "Discount", tax: "Tax", total: "Total", paid: "Paid", bal: "Balance due", dueamt: "Amount due", pay: "Payment details", notes: "Notes", sig: "Signature", add: "+ Add line", stamp: "PAID",
+        ph: { co: "Company name", tg: "Tagline", em: "Email", tel: "Phone", ad: "Address", cl: "Client name", item: "Item or service", pay: "Bank, account no., IBAN…", nt: "Payment terms, thank-you…", sg: "Sign here", tx: "Tax", no: "001" },
+        r: { tpl: "Template", acc: "Brand colour", cur: "Currency", tax: "Tax", disc: "Discount", dep: "Deposit paid", paid: "Mark as paid", incl: "Prices include tax", pct: "Percent", fix: "Fixed", expo: "Export", lg: "Add logo" },
+        t: { folio: "Folio", slab: "Slab", grid: "Grid", dusk: "Dusk", bloom: "Bloom" }, saved: "Saved", busy: "Rendering…", fail: "Could not build file", m1: "Image"
+      }
+    };
+    const CUR = { USD: { s: "$", d: 2, p: "pre", n: ["دلار آمریکا", "US Dollar"] }, EUR: { s: "€", d: 2, p: "pre", n: ["یورو", "Euro"] }, GBP: { s: "£", d: 2, p: "pre", n: ["پوند", "Pound"] }, CAD: { s: "CA$", d: 2, p: "pre", n: ["دلار کانادا", "Canadian Dollar"] }, AUD: { s: "A$", d: 2, p: "pre", n: ["دلار استرالیا", "Australian Dollar"] }, TRY: { s: "₺", d: 2, p: "pre", n: ["لیر ترکیه", "Turkish Lira"] }, INR: { s: "₹", d: 2, p: "pre", n: ["روپیه", "Rupee"] }, JPY: { s: "¥", d: 0, p: "pre", n: ["ین", "Yen"] }, AED: { s: "AED", f: "درهم", d: 2, p: "post", n: ["درهم امارات", "UAE Dirham"] }, IRT: { s: "Toman", f: "تومان", d: 0, p: "post", n: ["تومان", "Toman"] }, IRR: { s: "Rial", f: "ریال", d: 0, p: "post", n: ["ریال", "Rial"] } };
+    const SW = ["#ff5a36", "#2447ff", "#0f9d74", "#8b5cf6", "#111827", "#e11d74", "#f2a50c", "#0ea5c6"];
+    const DEF = { folio: "#ff5a36", slab: "#2447ff", grid: "#ffd400", dusk: "#8b5cf6", bloom: "#e11d74" };
+    const TH = { folio: '<rect width="44" height="60" fill="#fbfaf5"/><rect x="6" y="6" width="14" height="3" fill="#333"/><rect x="6" y="18" width="32" height="10" rx="2" fill="#ff5a36"/><path d="M6 36H38M6 42H38M6 48H38" stroke="#ccc"/>', slab: '<rect width="44" height="60" fill="#fff"/><rect width="15" height="60" fill="#2447ff"/><rect x="20" y="8" width="18" height="5" fill="#222"/><path d="M20 24H38M20 30H38M20 36H38" stroke="#ccc"/>', grid: '<rect width="44" height="60" fill="#fff"/><path d="M5 5H39V55H5ZM5 18H39M22 5V30M5 30H39M5 44H39" stroke="#111" fill="none"/><rect x="22.5" y="18.5" width="16" height="11" fill="#ffd400"/>', dusk: '<rect width="44" height="60" fill="#0d0f14"/><circle cx="38" cy="4" r="22" fill="#8b5cf6" opacity=".45"/><rect x="6" y="22" width="32" height="10" rx="3" fill="#fff" opacity=".12"/><rect x="6" y="36" width="32" height="16" rx="3" fill="#fff" opacity=".12"/>', bloom: '<rect width="44" height="60" fill="#fff"/><rect width="44" height="30" fill="#fbd5e6"/><rect x="6" y="16" width="14" height="14" rx="4" fill="#fff"/><rect x="24" y="16" width="14" height="14" rx="4" fill="#fff"/><rect x="6" y="36" width="32" height="16" rx="5" fill="none" stroke="#f3a7c6"/>' };
+    const $ = s => document.querySelector(s), esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const hx = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), mix = (a, b, p) => { const A = hx(a), B = hx(b); return "#" + A.map((v, i) => Math.round(v * (1 - p) + B[i] * p).toString(16).padStart(2, "0")).join("") };
+    const lum = h => { const [r, g, b] = hx(h); return (.299 * r + .587 * g + .114 * b) / 255 };
+    const today = new Date().toISOString().slice(0, 10);
+    let L = "fa", tpl = "folio", logo = "";
+    let S = { co: "", tg: "", ce: "", cp: "", ca: "", cl: "", le: "", lp: "", la: "", no: "001", ti: null, dt: today, du: "", pay: "", nt: "", sg: "", cur: "USD", tax: "", txl: "", incl: false, dtype: "pct", disc: "", dep: "", paid: false, acc: DEF.folio };
+    let items = [{ d: "", q: "1", p: "" }];
+    try { const s = JSON.parse(localStorage.getItem("inv3") || "null"); if (s) { S = s.S; items = s.items; logo = s.logo || ""; tpl = s.tpl; L = s.L } } catch (e) { }
+    const save = () => { try { localStorage.setItem("inv3", JSON.stringify({ S, items, logo, tpl, L })) } catch (e) { } };
+    function pn(v) { const m = x => String(x ?? "").replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[,٬\s]/g, "").replace("٫", "."); return parseFloat(m(v)) || 0 }
+    const nfor = () => { const c = CUR[S.cur]; return new Intl.NumberFormat(L == "fa" ? "fa-IR" : "en-US", { minimumFractionDigits: c.d, maximumFractionDigits: c.d }) };
+    const sym = () => { const c = CUR[S.cur]; return L == "fa" ? (c.f || c.s) : c.s };
+    const moneyT = n => { const c = CUR[S.cur], v = nfor().format(n); return c.p == "pre" ? sym() + v : v + " " + sym() };
+    const money = n => CUR[S.cur].p == "pre" ? `<bdi dir="ltr">${moneyT(n)}</bdi>` : moneyT(n);
+    function calc() {
+      const sub = items.reduce((a, x) => a + pn(x.q) * pn(x.p), 0); let dc = S.dtype == "pct" ? sub * pn(S.disc) / 100 : pn(S.disc); dc = Math.min(Math.max(dc, 0), sub);
+      const base = sub - dc, rate = pn(S.tax); let tx = 0, tot = base; if (rate > 0) { if (S.incl) tx = base - base / (1 + rate / 100); else { tx = base * rate / 100; tot = base + tx } }
+      const paid = S.paid ? tot : Math.min(pn(S.dep), tot); return { sub, dc, tx, tot, paid, bal: tot - paid, rate }
+    }
+    function paint() { const p = $("#paper"), a = S.acc, dark = lum(a) < .62; p.style.setProperty("--acc", a); p.style.setProperty("--on", dark ? "#fff" : "#111"); p.style.setProperty("--dk", mix(a, "#000", .4)); p.style.setProperty("--t1", mix(a, "#fff", .88)); p.style.setProperty("--t2", mix(a, "#fff", .7)); p.style.setProperty("--lt", mix(a, "#fff", .35)); const [r, g, b] = hx(a); p.style.setProperty("--gl", `rgba(${r},${g},${b},.5)`) }
+    function dfmt(v) { return v ? new Date(v).toLocaleDateString(L == "fa" ? "fa-IR-u-ca-persian" : "en-US", { year: "numeric", month: "short", day: "numeric" }) : "—" }
+    function render() {
+      const t = T[L], p = $("#paper"); p.dataset.t = tpl; p.dir = L == "fa" ? "rtl" : "ltr"; paint();
+      const i = (k, ph, c = "") => `<input class="${c}" data-k="${k}" value="${esc(S[k])}" placeholder="${ph}">`, ta = (k, ph) => `<textarea rows="1" data-k="${k}" placeholder="${ph}">${esc(S[k])}</textarea>`, d = (k) => `<div class="dt"><span>${dfmt(S[k])}</span><input type="date" data-k="${k}" value="${S[k]}"></div>`;
+      p.innerHTML = `<div class="a-brand"><label class="lgz ${logo ? "has" : "ui"}">${logo ? `<img src="${logo}">` : t_(t.r.lg)}<input type="file" id="logo" accept="image/*"></label>${i("co", t.ph.co, "bn")}${i("tg", t.ph.tg)}</div>
+ <div class="a-title">${i("ti", t.inv, "ttl").replace(`value="${esc(S.ti)}"`, `value="${esc(S.ti ?? t.inv)}"`)}<div class="no"><span>${t.no}</span>${i("no", t.ph.no)}</div></div>
+ <div class="a-hero"><div class="lb">${t.dueamt}</div><div class="big" id="hero"></div></div>
+ <div class="a-meta"><div><div class="lb">${t.no}</div>${S.no || "—"}</div><div><div class="lb">${t.date}</div>${d("dt")}</div><div><div class="lb">${t.due}</div>${d("du")}</div></div>
+ <div class="a-to"><div class="lb">${t.to}</div>${i("cl", t.ph.cl, "bn")}${i("le", t.ph.em)}${i("lp", t.ph.tel)}${ta("la", t.ph.ad)}</div>
+ <div class="a-from"><div class="lb">${t.from}</div>${i("ce", t.ph.em)}${i("cp", t.ph.tel)}${ta("ca", t.ph.ad)}</div>
+ <div class="a-items"><table><thead><tr><th>${t.desc}</th><th class="q">${t.qty}</th><th class="n">${t.rate}</th><th class="n">${t.amt}</th></tr></thead><tbody id="rows"></tbody></table><button class="ui add" id="add">${t.add}</button></div>
+ <div class="a-pay"><div class="lb">${t.pay}</div>${ta("pay", t.ph.pay)}<div class="lb" style="margin-top:14px">${t.notes}</div>${ta("nt", t.ph.nt)}</div>
+ <div class="a-tot" id="tot"></div>
+ <div class="a-sig">${i("sg", t.ph.sg, "sgi")}<div class="lb">${t.sig}</div></div><div class="stamp" id="stamp">${t.stamp}</div>`;
+      rows(); recalc(); p.querySelectorAll("textarea").forEach(grow); fit(); save()
+    }
+    const t_ = s => `<span>＋<br>${s}</span>`;
+    function rows() { $("#rows").innerHTML = items.map((r, n) => `<tr><td><textarea rows="1" data-r="${n}" data-f="d" placeholder="${T[L].ph.item}">${esc(r.d)}</textarea></td><td class="q"><input data-r="${n}" data-f="q" inputmode="decimal" value="${esc(r.q)}"></td><td class="n"><input data-r="${n}" data-f="p" inputmode="decimal" value="${esc(r.p)}" placeholder="0"></td><td class="n"><span data-ra="${n}"></span><button class="ui x" data-del="${n}">×</button></td></tr>`).join(""); $("#rows").querySelectorAll("textarea").forEach(grow) }
+    function recalc() {
+      const t = T[L], c = calc();
+      document.querySelectorAll("[data-ra]").forEach(e => { const r = items[e.dataset.ra]; e.innerHTML = money(pn(r.q) * pn(r.p)) });
+      const row = (l, v, cl = "") => `<div class="${cl}"><span>${l}</span><span>${v}</span></div>`;
+      $("#tot").innerHTML = `<div class="tot">${c.dc > 0 || c.tx > 0 ? row(t.sub, money(c.sub), "mu") : ""}${c.dc > 0 ? row(t.disc + (S.dtype == "pct" ? " " + nfor().format(pn(S.disc)).replace(/\.00$/, "") + "%" : ""), "−" + money(c.dc), "mu") : ""}${c.tx > 0 ? row((S.txl || t.tax) + " " + new Intl.NumberFormat(L == "fa" ? "fa-IR" : "en-US").format(c.rate) + "%", money(c.tx), "mu") : ""}${row(t.total, money(c.tot), "gt")}${c.paid > 0 ? row(t.paid, "−" + money(c.paid), "mu") : ""}${c.paid > 0 ? row(t.bal, money(c.bal), "bd") : ""}</div>`;
+      $("#hero").innerHTML = money(c.bal); $("#stamp").style.display = S.paid ? "block" : "none"; save()
+    }
+    function grow(e) { e.style.height = "auto"; e.style.height = e.scrollHeight + "px" }
+    function fit() { const w = $("#pw"), p = $("#paper"), s = Math.min(1, w.clientWidth / 794); p.style.transform = `scale(${s})`; w.style.height = p.offsetHeight * s + "px" }
+    function rail() {
+      const t = T[L], r = t.r;
+      $("#rail").innerHTML = `<div class="rs"><h4>${r.tpl}</h4><div class="tg">${Object.keys(t.t).map(k => `<button class="tb ${k == tpl ? "on" : ""}" data-tpl="${k}"><svg viewBox="0 0 44 60">${TH[k]}</svg>${t.t[k]}</button>`).join("")}</div></div>
+ <div class="rs"><h4>${r.acc}</h4><div class="sw">${SW.map(c => `<button style="background:${c}" class="${c == S.acc ? "on" : ""}" data-acc="${c}"></button>`).join("")}<input type="color" value="${S.acc}" data-s="acc"></div></div>
+ <div class="rs"><h4>${r.cur}</h4><select data-s="cur">${Object.keys(CUR).map(k => `<option value="${k}" ${k == S.cur ? "selected" : ""}>${k} · ${CUR[k].n[L == "fa" ? 0 : 1]}  (${L == "fa" ? (CUR[k].f || CUR[k].s) : CUR[k].s})</option>`).join("")}</select></div>
+ <div class="rs"><h4>${r.tax}</h4><div class="r2"><input type="text" data-s="txl" value="${esc(S.txl)}" placeholder="${t.ph.tx} (VAT)"><input type="text" data-s="tax" inputmode="decimal" value="${esc(S.tax)}" placeholder="%"></div><label class="chk"><input type="checkbox" data-s="incl" ${S.incl ? "checked" : ""}>${r.incl}</label></div>
+ <div class="rs"><h4>${r.disc}</h4><div class="seg" style="margin-bottom:8px"><button data-set="dtype:pct" class="${S.dtype == "pct" ? "on" : ""}">${r.pct}</button><button data-set="dtype:fix" class="${S.dtype == "fix" ? "on" : ""}">${r.fix}</button></div><input type="text" data-s="disc" inputmode="decimal" value="${esc(S.disc)}" placeholder="0"></div>
+ <div class="rs"><h4>${r.dep}</h4><input type="text" data-s="dep" inputmode="decimal" value="${esc(S.dep)}" placeholder="0"></div>
+ <div class="rs sp"><span style="font-weight:600">${r.paid}</span><button class="tgl ${S.paid ? "on" : ""}" data-tg="paid"></button></div>`;
+      $("#expb").textContent = r.expo + " ↓"; $("#m1").textContent = t.m1;
+      document.querySelectorAll("#lang button").forEach(b => b.classList.toggle("on", b.dataset.lang == L));
+    }
+    document.addEventListener("input", e => {
+      const el = e.target, k = el.dataset.k, r = el.dataset.r, s = el.dataset.s;
+      if (k) { S[k] = el.value; if (el.type == "date") { el.previousElementSibling.textContent = dfmt(el.value) } if (el.tagName == "TEXTAREA") grow(el); if (k == "no") { const m = $(".a-meta div"); if (m) m.lastChild.textContent = el.value || "—" } save() }
+      else if (r !== undefined) { items[r][el.dataset.f] = el.value; if (el.tagName == "TEXTAREA") grow(el); recalc() }
+      else if (s) { S[s] = el.type == "checkbox" ? el.checked : el.value; if (s == "acc") { paint(); rail() } recalc() }
+    });
+    document.addEventListener("click", e => {
+      const g = a => e.target.closest(`[${a}]`); let x;
+      if (x = g("data-tpl")) { tpl = x.dataset.tpl; S.acc = DEF[tpl]; rail(); render() }
+      else if (x = g("data-acc")) { S.acc = x.dataset.acc; rail(); paint(); save() }
+      else if (x = g("data-set")) { const [k, v] = x.dataset.set.split(":"); S[k] = v; rail(); recalc() }
+      else if (x = g("data-tg")) { S[x.dataset.tg] = !S[x.dataset.tg]; rail(); recalc() }
+      else if (x = g("data-lang")) { L = x.dataset.lang; boot() }
+      else if (x = g("data-del")) { if (items.length > 1) { items.splice(x.dataset.del, 1); rows(); recalc() } }
+      else if (e.target.closest("#add")) { items.push({ d: "", q: "1", p: "" }); rows(); recalc(); fit() }
+      else if (e.target.closest(".dt")) { const i = e.target.closest(".dt").querySelector("input"); try { i.showPicker() } catch (_) { } }
+      if (!e.target.closest(".exp")) $("#menu").classList.remove("o")
+    });
+    document.addEventListener("change", e => { if (e.target.id == "logo") { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { logo = r.result; render() }; r.readAsDataURL(f) } });
+    $("#expb").onclick = () => $("#menu").classList.toggle("o");
+    addEventListener("resize", fit);
+    /* ===== export ===== */
+    function toast(m, k) { const t = $("#toast"); t.textContent = m; t.classList.add("s"); clearTimeout(toast.h); if (!k) toast.h = setTimeout(() => t.classList.remove("s"), 2200) }
+    async function snap() {
+      await document.fonts.ready; return html2canvas($("#paper"), {
+        scale: 2, backgroundColor: null, useCORS: true, onclone: d => {
+          const p = d.getElementById("paper"); p.style.transform = "none"; const w = d.getElementById("pw"); w.style.height = "auto"; w.style.overflow = "visible"; w.style.boxShadow = "none";
+          p.querySelectorAll(".ui,.dt input,#logo").forEach(n => n.remove());
+          p.querySelectorAll("input,textarea").forEach(el => { const x = d.createElement("div"); x.className = el.className; x.style.cssText = "white-space:pre-wrap;word-break:break-word;min-height:1.4em;width:100%"; x.textContent = el.value; el.replaceWith(x) })
+        }
+      })
+    }
+    const blob = (c, ty = "image/png", q) => new Promise(r => c.toBlob(r, ty, q));
+    async function out(name, b) {
+      let d = null; try { d = window.claude ? await claude.use("downloads") : null } catch (e) { }
+      if (d) { try { await d.save({ filename: name, data: b }); toast(T[L].saved) } catch (e) { if (e && e.code != "declined") toast(T[L].fail) } } else { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name; a.click(); toast(T[L].saved) }
+    }
+    const fn = s => "invoice-" + (String(S.no || "1").replace(/[^\w-]/g, "") || "1") + s;
+    async function social(W, H, li) {
+      const c = await snap(), x = document.createElement("canvas"); x.width = W; x.height = H; const g = x.getContext("2d"), a = S.acc, fa = L == "fa";
+      const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, mix(a, "#000", .6)); bg.addColorStop(1, mix(a, "#0b0b0b", .05)); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+      g.fillStyle = "rgba(255,255,255,.07)"; g.beginPath(); g.arc(fa ? W * .15 : W * .85, H * .12, H * .38, 0, 7); g.fill();
+      const pw = li ? 500 : Math.min(780, (H - 130) * c.width / c.height), ph = pw * c.height / c.width, px = li ? (fa ? 70 : W - pw - 70) : (W - pw) / 2, py = li ? 64 : (H - ph) / 2;
+      g.save(); g.translate(px + pw / 2, py + ph / 2); g.rotate((li ? (fa ? -4 : 4) : -3) * Math.PI / 180); g.shadowColor = "rgba(0,0,0,.55)"; g.shadowBlur = 60; g.shadowOffsetY = 28; g.drawImage(c, -pw / 2, -ph / 2, pw, ph); g.restore();
+      if (li) {
+        const t = T[L], k = calc(); g.direction = fa ? "rtl" : "ltr"; g.textAlign = fa ? "right" : "left"; const tx = fa ? W - 70 : 70; g.fillStyle = "rgba(255,255,255,.7)"; g.font = "700 22px 'Bricolage Grotesque',Vazirmatn"; g.fillText((S.ti ?? t.inv) + " · " + (S.no || ""), tx, 210);
+        g.fillStyle = "#fff"; g.font = "800 74px 'Bricolage Grotesque',Vazirmatn"; g.fillText(moneyT(k.tot), tx, 305); g.font = "500 26px 'Bricolage Grotesque',Vazirmatn"; g.fillStyle = "rgba(255,255,255,.8)"; if (S.cl) g.fillText((fa ? "برای " : "for ") + S.cl, tx, 355); g.fillText(S.co || "", tx, H - 70)
+      }
+      out(fn(li ? "-linkedin.png" : "-instagram.png"), await blob(x))
+    }
+    async function run(f) { $("#menu").classList.remove("o"); toast(T[L].busy, 1); try { await f() } catch (e) { console.error(e); toast(T[L].fail) } }
+    $("#menu").onclick = e => {
+      const k = e.target.closest("[data-x]")?.dataset.x; if (!k) return;
+      if (k == "png") run(async () => out(fn(".png"), await blob(await snap())));
+      if (k == "pdf") run(async () => { const c = await snap(), w = 595.28, h = w * c.height / c.width, P = new jspdf.jsPDF({ unit: "pt", format: [w, Math.max(h, 841.89)] }); P.addImage(c.toDataURL("image/jpeg", .95), "JPEG", 0, 0, w, h); out(fn(".pdf"), P.output("blob")) });
+      if (k == "ig") run(() => social(1080, 1350, 0)); if (k == "li") run(() => social(1200, 627, 1))
+    };
+    function boot() { document.documentElement.lang = L; document.documentElement.dir = L == "fa" ? "rtl" : "ltr"; rail(); render() }
+    boot();
+  </script>
+</body>
+
+</html>
